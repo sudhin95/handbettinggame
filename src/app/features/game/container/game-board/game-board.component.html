@@ -1,0 +1,169 @@
+<div class="game-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="score">
+      <div>BANKROLL</div>
+      <div [class.warning]="currentScore < 200">${{ currentScore }}</div>
+    </div>
+    <div class="header-buttons">
+      <button class="leaderboard-btn" (click)="toggleLeaderboard()">🏆 Leaderboard</button>
+      <button class="exit-btn" (click)="exitToLanding()">Exit</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div class="modal" *ngIf="showLeaderboard">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🏆 Top Scores</h2>
+        <button class="close-btn" (click)="toggleLeaderboard()">✕</button>
+      </div>
+      <div class="leaderboard-list">
+        <div class="leaderboard-item" *ngFor="let entry of leaderboard; let i = index">
+          <div class="rank">{{ i + 1 }}</div>
+          <div class="name">{{ entry.name }}</div>
+          <div class="score">${{ entry.score }}</div>
+          <div class="date">{{ entry.date }}</div>
+        </div>
+        <div class="empty" *ngIf="leaderboard.length === 0">
+          No scores yet. Be the first!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Score Dialog -->
+  <div class="modal" *ngIf="showSaveDialog">
+    <div class="modal-content save-dialog">
+      <div class="modal-header">
+        <h2>🎉 Game Over! 🎉</h2>
+      </div>
+      <div class="save-content">
+        <div class="final-score">Your Score: ${{ currentScore }}</div>
+        <input 
+          type="text" 
+          [(ngModel)]="playerName" 
+          placeholder="Enter your name"
+          maxlength="20"
+          class="name-input">
+        <div class="dialog-buttons">
+          <button class="save-btn" (click)="saveScore()">Save Score</button>
+          <button class="skip-btn" (click)="showSaveDialog = false; startNewGame()">Skip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Game -->
+  <div class="game" *ngIf="!gameOver">
+    
+    <!-- Current Hand -->
+    <div class="hand current">
+      <h3>🎴 CURRENT HAND</h3>
+      <div class="total">Total: {{ currentHandValue }}</div>
+      <div class="tiles">
+        <div class="tile" *ngFor="let tile of currentHand">
+          <div class="icon">{{ getTileIcon(tile) }}</div>
+          <div class="name">{{ tile.name }}</div>
+          <div class="value" [class]="getValueClass(getTileValue(tile))">
+            {{ getTileValue(tile) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Indicator -->
+    <div class="result" *ngIf="showNextHand && roundResult">
+      <div class="arrow" [class.win]="roundResult === 'WIN'" [class.lose]="roundResult === 'LOSE'">
+        {{ roundResult === 'WIN' ? '✓' : '✗' }}
+      </div>
+      <div class="bet">{{ currentBet }}</div>
+    </div>
+
+    <!-- Next Hand -->
+    <div class="hand next" [class.revealed]="showNextHand">
+      <h3>🔮 NEXT HAND</h3>
+      <div class="total" *ngIf="showNextHand">Total: {{ nextHandValue }}</div>
+      <div class="total" *ngIf="!showNextHand">Total: ???</div>
+      <div class="tiles">
+        <div class="tile" *ngFor="let tile of nextHand">
+          <!-- Hidden -->
+          <div class="tile-back" *ngIf="!showNextHand">
+            <div class="icon">🎴</div>
+            <div class="name">???</div>
+            <div class="value">?</div>
+          </div>
+          <!-- Revealed -->
+          <div class="tile-front" *ngIf="showNextHand">
+            <div class="icon">{{ getTileIcon(tile) }}</div>
+            <div class="name">{{ tile.name }}</div>
+            <div class="value" [class]="getValueClass(getTileValue(tile))">
+              {{ getTileValue(tile) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Betting Panel -->
+    <div class="betting" *ngIf="canBet && !showNextHand">
+      <div class="bet-amount">
+        <label>Bet Amount:</label>
+        <button (click)="decreaseBet()">-50</button>
+        <input type="number" [value]="betAmount" (input)="updateBetAmount($event)">
+        <button (click)="increaseBet()">+50</button>
+      </div>
+      
+      <div class="bet-buttons">
+        <button (click)="placeBet('HIGHER')" [disabled]="betAmount > currentScore">
+          ⬆ HIGHER (Next > {{ currentHandValue }})
+        </button>
+        <button (click)="placeBet('LOWER')" [disabled]="betAmount > currentScore">
+          ⬇ LOWER (Next < {{ currentHandValue }})
+        </button>
+      </div>
+      
+      <div class="stats">
+        <span>🎴 Draw: {{ drawPile.length }}</span>
+        <span>🗑️ Discard: {{ discardPile.length }}</span>
+        <span>🔄 Reshuffles: {{ reshuffleCount }}/3</span>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" *ngIf="!canBet && showNextHand && !roundResult">
+      <div class="spinner"></div>
+      <div>Revealing...</div>
+    </div>
+
+    <!-- History -->
+    <div class="history">
+      <h4>📜 Recent Hands</h4>
+      <div class="history-list">
+        <div class="history-item" *ngFor="let hand of handHistory">
+          <span class="result-badge" [class.win]="hand.result === 'WIN'" [class.lose]="hand.result === 'LOSE'">
+            {{ hand.result }}
+          </span>
+          <span class="hand-tiles">{{ hand.tilesDisplay }}</span>
+          <span class="hand-value">{{ hand.totalValue }}</span>
+          <span class="hand-bet">{{ hand.bet }}</span>
+        </div>
+        <div class="empty" *ngIf="handHistory.length === 0">No hands played yet</div>
+      </div>
+    </div>
+
+    <!-- Tile Tracker -->
+    <div class="tracker">
+      <h4>📊 Special Tile Values</h4>
+      <div class="tracker-grid">
+        <div class="tracker-item" *ngFor="let item of tileValues | keyvalue">
+          <span>{{ item.key }}</span>
+          <div class="bar">
+            <div class="fill" [style.width.%]="(item.value / 10) * 100"></div>
+            <span>{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

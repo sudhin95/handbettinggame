@@ -1,0 +1,64 @@
+<div class="game-container">
+ <div class="game-header">
+    <div class="score-panel">
+      <div class="score-label">BANKROLL</div>
+      <div class="score-value" [class.warning]="currentScore < 200">
+         ${{ currentScore }}
+      </div>
+    </div>
+    <button class="exit-btn" (click)="exitToLanding()">
+      🚪 Exit Game
+    </button>
+  </div>
+
+    <div class="game-overlay" *ngIf="gameOver">
+    <div class="game-over-card">
+      <h2>🎮 Game Over! 🎮</h2>
+      <div class="final-score">Final Score: ${{ finalScore }}</div>
+      <div class="button-group">
+        <button class="new-game-btn" (click)="startNewGame()">
+          🔄 Play Again
+        </button>
+        <button class="exit-btn" (click)="exitToLanding()">
+          🏠 Main Menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <div class="game-area" *ngIf="!gameOver">
+    <!-- Current Hand Section -->
+        <div class="hand-section current-hand">
+        <div class="hand-header">
+            <div class="hand-label">🎴 CURRENT HAND</div>
+            <div class="hand-value">Total: {{ currentHandValue }}</div>
+        </div>
+        <div class="tiles-container">
+            <div class="tile-card" *ngFor="let tile of currentHand">
+                <div class="tile-front">
+                    <div class="tile-icon">{{ getTileIcon(tile) }}</div>
+            <div class="tile-name">rrr</div>
+            <div class="tile-value" [class]="getTileValueClass(getTileDisplayValue(tile))">
+                {{ getTileDisplayValue(tile) }}
+            </div>
+
+                </div>
+            
+            </div>
+        </div>
+        </div>
+
+          <div class="vs-indicator" *ngIf="isNextHandRevealed">
+      <div class="bet-arrow" [class.win]="getLatestHandWon()" [class.lose]="!getLatestHandWon() && getLatestHandResult() !== ''">
+        {{ getLatestHandResult() === 'WIN' ? '✓' : (getLatestHandResult() === 'LOSE' ? '✗' : '?') }}
+      </div>
+      <div class="bet-type">{{ currentBet }}</div>
+    </div>
+
+
+
+
+    </div>
+
+
+  </div>

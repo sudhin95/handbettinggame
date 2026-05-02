@@ -1,0 +1,36 @@
+<div class="landing-wrapper">
+
+  <!-- Background Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Main Card -->
+  <nz-card class="landing-card">
+
+    <div class="title">🎴 Hand Betting Game</div>
+    <div class="subtitle">
+      Test your luck. Master the tiles. Beat the odds.
+    </div>
+
+    <div class="actions">
+      <button nz-button nzType="primary" nzSize="large" routerLink="/game">
+        ▶ Start New Game
+      </button>
+
+      <button nz-button nzSize="large" routerLink="/leaderboard">
+        🏆 Leaderboard
+      </button>
+    </div>
+
+    <!-- Leaderboard Preview -->
+    <div class="leaderboard-preview">
+      <h3>Top Players</h3>
+
+      <div class="leader-item" *ngFor="let player of topPlayers">
+        <span>{{ player.name }}</span>
+        <span>{{ player.score }}</span>
+      </div>
+    </div>
+
+  </nz-card>
+
+</div>
