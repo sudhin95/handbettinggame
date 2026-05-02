@@ -21,14 +21,48 @@
       </button>
     </div>
 
+    <!-- Stats Summary -->
+    <div class="stats-summary" *ngIf="topPlayers.length > 0">
+      <div class="stat-item">
+        <div class="stat-label">Highest Score</div>
+        <div class="stat-value">${{ getHighestScore() }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Total Players</div>
+        <div class="stat-value">{{ getTotalPlayers() }}</div>
+      </div>
+    </div>
+
     <!-- Leaderboard Preview -->
     <div class="leaderboard-preview">
-      <h3>Top Players</h3>
-
-      <div class="leader-item" *ngFor="let player of topPlayers">
-        <span>{{ player.name }}</span>
-        <span>{{ player.score }}</span>
+      <h3>🏆 Top Players</h3>
+      
+      <div class="leaderboard-list" *ngIf="topPlayers.length > 0; else noData">
+        <div class="leader-item header">
+          <span>Rank</span>
+          <span>Player</span>
+          <span>Score</span>
+        </div>
+        <div class="leader-item" *ngFor="let player of topPlayers; let i = index">
+          <span class="rank">
+            <span class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+              {{ i + 1 }}
+            </span>
+          </span>
+          <span class="player-name">{{ player.name }}</span>
+          <span class="player-score">${{ player.score }}</span>
+        </div>
       </div>
+      
+      <ng-template #noData>
+        <div class="empty-state">
+          <div class="empty-icon">🎮</div>
+          <div class="empty-text">No scores yet. Be the first to play!</div>
+          <button nz-button nzType="default" routerLink="/game" class="play-now-btn">
+            Play Now
+          </button>
+        </div>
+      </ng-template>
     </div>
 
   </nz-card>

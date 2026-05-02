@@ -20,17 +20,7 @@ const routes: Routes = [
       import('./features/game/game.module').then(m => m.GameModule)
   },
 
-  {
-    path: 'betting',
-    loadChildren: () =>
-      import('./features/betting/betting.module').then(m => m.BettingModule)
-  },
 
-  {
-    path: 'leaderboard',
-    loadChildren: () =>
-      import('./features/leaderboard/leaderboard.module').then(m => m.LeaderboardModule)
-  },
 
   {
     path: '**',

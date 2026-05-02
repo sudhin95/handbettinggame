@@ -1,61 +1,246 @@
 .landing-wrapper {
-  height: 100vh;
-  background: linear-gradient(135deg, #1e293b, #0f172a);
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a472a 0%, #0d2818 100%);
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .overlay {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(6px);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .landing-card {
-  width: 420px;
-  padding: 30px;
-  border-radius: 16px;
-  text-align: center;
+  position: relative;
   z-index: 1;
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  max-width: 500px;
+  width: 100%;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(13, 13, 13, 0.95));
+  border-radius: 20px;
+  border: 2px solid #ffd700;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  backdrop-filter: blur(10px);
+  
+  ::ng-deep .ant-card-body {
+    padding: 40px;
+  }
 }
 
 .title {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: bold;
-  margin-bottom: 10px;
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .subtitle {
-  font-size: 14px;
-  margin-bottom: 25px;
-  opacity: 0.8;
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 40px;
+  line-height: 1.5;
 }
 
 .actions {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  
+  button {
+    min-width: 180px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+  
+  [nzType="primary"] {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #45a049, #3d8b40);
+    }
+  }
+  
+  [nzType="default"] {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border: 1px solid #ffd700;
+    
+    &:hover {
+      background: rgba(255, 215, 0, 0.3);
+    }
+  }
+}
+
+.stats-summary {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
   margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 15px;
+  
+  .stat-item {
+    text-align: center;
+    
+    .stat-label {
+      color: #ccc;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      color: #ffd700;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
 }
 
 .leaderboard-preview {
-  text-align: left;
+  margin-top: 20px;
+  
+  h3 {
+    color: #ffd700;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  
+  .leaderboard-list {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    overflow: hidden;
+    
+    .leader-item {
+      display: grid;
+      grid-template-columns: 80px 1fr 100px;
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+      transition: all 0.3s ease;
+      
+      &.header {
+        background: rgba(255, 215, 0, 0.2);
+        color: #ffd700;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      
+      &:not(.header):hover {
+        background: rgba(255, 215, 0, 0.1);
+        transform: translateX(5px);
+      }
+      
+      .rank {
+        text-align: center;
+        
+        .rank-badge {
+          display: inline-block;
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          text-align: center;
+          border-radius: 50%;
+          background: #666;
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+          
+          &.gold {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+          }
+          
+          &.silver {
+            background: linear-gradient(135deg, #c0c0c0, #808080);
+          }
+          
+          &.bronze {
+            background: linear-gradient(135deg, #cd7f32, #8b4513);
+          }
+        }
+      }
+      
+      .player-name {
+        text-align: left;
+        color: white;
+        font-weight: 500;
+      }
+      
+      .player-score {
+        text-align: right;
+        color: #4caf50;
+        font-weight: bold;
+      }
+    }
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    
+    .empty-text {
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+    
+    .play-now-btn {
+      background: linear-gradient(135deg, #4caf50, #45a049);
+      border: none;
+      color: white;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
 }
 
-.leaderboard-preview h3 {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.leader-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+// Responsive
+@media (max-width: 768px) {
+  .landing-card {
+    ::ng-deep .ant-card-body {
+      padding: 25px;
+    }
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .actions button {
+    min-width: 140px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .leader-item {
+    grid-template-columns: 60px 1fr 80px !important;
+    font-size: 12px;
+    padding: 10px !important;
+  }
 }

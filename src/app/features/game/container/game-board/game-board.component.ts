@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+
 
 interface Tile {
   id: string;
@@ -69,7 +71,7 @@ export class GameBoardComponent implements OnInit {
   private readonly WINDS = ['East', 'South', 'West', 'North'];
   private readonly DRAGONS = ['Red', 'Green', 'White'];
   
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private router: Router) {}
   
   ngOnInit() {
     this.startNewGame();
@@ -95,6 +97,8 @@ export class GameBoardComponent implements OnInit {
     // Create and shuffle deck
     this.drawPile = this.shuffleArray(this.generateDeck());
     this.discardPile = [];
+
+    console.log(",dsfs", this.drawPile);
     
     // Deal initial hands
     this.dealHands();
@@ -103,34 +107,40 @@ export class GameBoardComponent implements OnInit {
   generateDeck(): Tile[] {
     const deck: Tile[] = [];
     
-    // Number tiles (1-9)
+    // Number tiles (1-9) - add 2 copies each for better gameplay
     for (let i = 1; i <= 9; i++) {
-      deck.push({
-        id: `num-${i}`,
-        type: 'number',
-        name: i.toString(),
-        value: i
-      });
+      for (let copy = 0; copy < 2; copy++) {
+        deck.push({
+          id: `num-${i}-${copy}`,
+          type: 'number',
+          name: i.toString(),
+          value: i
+        });
+      }
     }
     
     // Wind tiles
     this.WINDS.forEach(wind => {
-      deck.push({
-        id: `wind-${wind}`,
-        type: 'wind',
-        name: wind,
-        value: this.tileValues[wind]
-      });
+      for (let copy = 0; copy < 2; copy++) {
+        deck.push({
+          id: `wind-${wind}-${copy}`,
+          type: 'wind',
+          name: wind,
+          value: this.tileValues[wind]
+        });
+      }
     });
     
     // Dragon tiles
     this.DRAGONS.forEach(dragon => {
-      deck.push({
-        id: `dragon-${dragon}`,
-        type: 'dragon',
-        name: dragon,
-        value: this.tileValues[dragon]
-      });
+      for (let copy = 0; copy < 2; copy++) {
+        deck.push({
+          id: `dragon-${dragon}-${copy}`,
+          type: 'dragon',
+          name: dragon,
+          value: this.tileValues[dragon]
+        });
+      }
     });
     
     return deck;
@@ -163,7 +173,7 @@ export class GameBoardComponent implements OnInit {
     this.canBet = false;
     this.showNextHand = true;
     
-    setTimeout(() => this.determineWinner(), 500);
+    setTimeout(() => this.determineWinner(), 1500);
   }
   
   determineWinner() {
@@ -205,7 +215,10 @@ export class GameBoardComponent implements OnInit {
     this.checkGameOver();
     
     if (!this.gameOver) {
-      this.nextRound();
+      // Wait for result to be visible before next round
+      setTimeout(() => {
+        this.nextRound();
+      }, 2000);
     }
   }
   
@@ -230,8 +243,14 @@ export class GameBoardComponent implements OnInit {
     
     // Draw new next hand
     if (this.drawPile.length < 3) this.reshuffle();
-    this.nextHand = this.drawPile.splice(0, 3);
-    this.nextHandValue = this.calculateValue(this.nextHand);
+    if (this.drawPile.length >= 3) {
+      this.nextHand = this.drawPile.splice(0, 3);
+      this.nextHandValue = this.calculateValue(this.nextHand);
+    } else {
+      this.gameOver = true;
+      this.showSaveDialog = true;
+      return;
+    }
     
     // Reset for next round
     this.currentBet = null;
@@ -240,20 +259,47 @@ export class GameBoardComponent implements OnInit {
     this.roundResult = null;
   }
   
-  reshuffle() {
-    if (this.reshuffleCount >= 3) return;
+  // reshuffle() {
+  //   if (this.reshuffleCount >= 3) return;
     
-    this.reshuffleCount++;
-    const allTiles = [...this.drawPile, ...this.discardPile, ...this.generateDeck()];
-    this.drawPile = this.shuffleArray(allTiles);
-    this.discardPile = [];
+  //   this.reshuffleCount++;
+  //   const allTiles = [...this.drawPile, ...this.discardPile];
+  //   const freshTiles = this.generateDeck();
+  //   const combined = [...allTiles, ...freshTiles];
+  //   this.drawPile = this.shuffleArray(combined);
+  //   this.discardPile = [];
+  // }
+
+  reshuffle() {
+  if (this.reshuffleCount >= 3) return;
+  
+  this.reshuffleCount++;
+  
+  // Only use discard pile to create new draw pile
+  // The discard pile contains all tiles that have been played
+  if (this.discardPile.length === 0) {
+    console.log('No tiles to reshuffle!');
+    return;
   }
+  
+  // Take all tiles from discard pile
+  const allTiles = [...this.discardPile];
+  
+  // Shuffle them to create new draw pile
+  this.drawPile = this.shuffleArray(allTiles);
+  
+  // Clear discard pile
+  this.discardPile = [];
+  
+  console.log(`Reshuffled deck! (${this.reshuffleCount}/3) New draw pile size: ${this.drawPile.length}`);
+}
   
   checkGameOver() {
     // Check tile values
     for (const [name, value] of Object.entries(this.tileValues)) {
       if (value === 0 || value === 10) {
         this.gameOver = true;
+        this.showSaveDialog = true;
         return;
       }
     }
@@ -261,16 +307,13 @@ export class GameBoardComponent implements OnInit {
     // Check reshuffles
     if (this.reshuffleCount >= 3 && this.drawPile.length < 3) {
       this.gameOver = true;
+      this.showSaveDialog = true;
       return;
     }
     
     // Check money
     if (this.currentScore <= 0) {
       this.gameOver = true;
-    }
-    
-    // Show save dialog when game ends
-    if (this.gameOver) {
       this.showSaveDialog = true;
     }
   }
@@ -289,13 +332,14 @@ export class GameBoardComponent implements OnInit {
     
     this.leaderboard.push(newEntry);
     this.leaderboard.sort((a, b) => b.score - a.score);
-    this.leaderboard = this.leaderboard.slice(0, 10); // Keep top 10
+    this.leaderboard = this.leaderboard.slice(0, 10);
     
-    // Save to JSON file
     this.saveLeaderboardToFile();
+    this.saveToLocalStorage();
     
     this.showSaveDialog = false;
     this.playerName = '';
+    this.startNewGame();
   }
   
   saveLeaderboardToFile() {
@@ -310,12 +354,10 @@ export class GameBoardComponent implements OnInit {
   }
   
   loadLeaderboard() {
-    // Try to load existing leaderboard from localStorage first
     const saved = localStorage.getItem('mahjong_leaderboard');
     if (saved) {
       this.leaderboard = JSON.parse(saved);
     } else {
-      // Load default from assets if available
       this.http.get<LeaderboardEntry[]>('/assets/leaderboard.json')
         .subscribe({
           next: (data) => {
@@ -323,7 +365,6 @@ export class GameBoardComponent implements OnInit {
             this.saveToLocalStorage();
           },
           error: () => {
-            // No existing file, start empty
             this.leaderboard = [];
           }
         });
@@ -378,11 +419,9 @@ export class GameBoardComponent implements OnInit {
     this.betAmount = Math.max(10, Math.min(this.currentScore, num));
   }
   
-  getHandDisplay(hand: Tile[]): string {
-    return hand.map(t => this.getTileIcon(t)).join(' ');
-  }
-  
   exitToLanding() {
-    this.startNewGame();
+        this.router.navigate(['/landing']);
+
+    // this.startNewGame();
   }
 }
