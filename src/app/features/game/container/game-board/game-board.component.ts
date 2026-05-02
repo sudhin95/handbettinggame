@@ -196,9 +196,37 @@ export class GameBoardComponent implements OnInit {
     
     // Update special tile values (based on CURRENT hand)
     this.updateTileValues(this.currentHand, won);
+
     
     // Create display string for history
-    const tilesDisplay = this.currentHand.map(t => this.getTileIcon(t)).join(' ');
+    // const tilesDisplay = this.currentHand.map(t => this.getTileIcon(t)).join(' ');
+
+  // const tilesDisplay = this.currentHand.map(t => {
+  //   const icon = this.getTileIcon(t);
+  //   const value = this.getTileValue(t);
+  //   return `${icon}${value}`;
+  // }).join(' ');
+
+//   const tilesDisplay = this.currentHand.map(t => {
+//   const icon = this.getTileIcon(t);
+//   const value = this.getTileValue(t);
+//   const name = t.name;
+//   return `${icon}${value} [${name}]`;
+// }).join(' ');
+
+const tilesDisplay = this.currentHand.map(t => {
+  const icon = this.getTileIcon(t);
+  const value = this.getTileValue(t);
+  
+  // Only show name for special tiles (winds and dragons)
+  if (t.type !== 'number') {
+    const name = t.name;
+    return `${icon}${value} [${name}]`;
+  } else {
+    // For number tiles, just show icon and value
+    return `${icon}${value}`;
+  }
+}).join(' ');
     
     // Save to history
     this.handHistory.unshift({
@@ -208,6 +236,9 @@ export class GameBoardComponent implements OnInit {
       result: this.roundResult,
       tilesDisplay: tilesDisplay
     });
+
+        console.log("tile values after round:", this.handHistory);
+
     
     if (this.handHistory.length > 5) this.handHistory.pop();
     
@@ -283,8 +314,11 @@ export class GameBoardComponent implements OnInit {
   }
   
   // Take all tiles from discard pile
-  const allTiles = [...this.discardPile];
+  const allTiles = [...this.discardPile, ...this.drawPile];
+
+  console.log("draw pile before reshuffle:", this.drawPile);
   
+  console.log("reshuffled tiles:", allTiles);
   // Shuffle them to create new draw pile
   this.drawPile = this.shuffleArray(allTiles);
   
