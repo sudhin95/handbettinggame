@@ -109,7 +109,7 @@ export class GameBoardComponent implements OnInit {
     
     // Number tiles (1-9) - add 2 copies each for better gameplay
     for (let i = 1; i <= 9; i++) {
-      for (let copy = 0; copy < 2; copy++) {
+      for (let copy = 0; copy < 1; copy++) {
         deck.push({
           id: `num-${i}-${copy}`,
           type: 'number',
@@ -121,7 +121,7 @@ export class GameBoardComponent implements OnInit {
     
     // Wind tiles
     this.WINDS.forEach(wind => {
-      for (let copy = 0; copy < 2; copy++) {
+      for (let copy = 0; copy < 1; copy++) {
         deck.push({
           id: `wind-${wind}-${copy}`,
           type: 'wind',
@@ -133,7 +133,7 @@ export class GameBoardComponent implements OnInit {
     
     // Dragon tiles
     this.DRAGONS.forEach(dragon => {
-      for (let copy = 0; copy < 2; copy++) {
+      for (let copy = 0; copy < 1; copy++) {
         deck.push({
           id: `dragon-${dragon}-${copy}`,
           type: 'dragon',
