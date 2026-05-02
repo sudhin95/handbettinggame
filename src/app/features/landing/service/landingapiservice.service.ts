@@ -21,10 +21,10 @@ export class LandingapiserviceService {
   //   return this.http.get<Array<any>>(postUrl, { headers: httpHeaders });
   // }
 
-  getLandingList(): Observable<any> {
-  const url = environment.apiUrl + environment.landingApiUrl;
+//   getLandingList(): Observable<any> {
+//   const url = environment.apiUrl + environment.landingApiUrl;
 
-  return this.http.get<any>(url);
-}
+//   return this.http.get<any>(url);
+// }
 
 }
