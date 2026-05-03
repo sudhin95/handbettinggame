@@ -69,7 +69,7 @@ Each round:
 - Leaderboard (LocalStorage)
 
 ## 🧠 Technical Approach
-- Angular + TypeScript
+- Angular(16.2.16)
 - LocalStorage for persistence
 
 ## ✍️ Handwritten vs AI
