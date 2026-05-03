@@ -9,7 +9,8 @@ Players bet whether the next hand will have a higher or lower value compared to 
 ### 1. Clone the Repository
 Git Repository URL = https://github.com/sudhin95/handbettinggame.git
 
-git clone <your-repository-url>
+git clone https://github.com/sudhin95/handbettinggame.git
+
 cd handbettinggame
 
 ### 2. Install Dependencies
