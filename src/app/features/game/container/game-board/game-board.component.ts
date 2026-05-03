@@ -74,6 +74,7 @@ export class GameBoardComponent implements OnInit {
   constructor(private http: HttpClient,private router: Router) {}
   
   ngOnInit() {
+     console.log("ddd>>>>", this.tileValues);
     this.startNewGame();
     this.loadLeaderboard();
   }
@@ -237,7 +238,7 @@ const tilesDisplay = this.currentHand.map(t => {
       tilesDisplay: tilesDisplay
     });
 
-        console.log("tile values after round:", this.handHistory);
+    console.log("tile values after round:", this.handHistory);
 
     
     if (this.handHistory.length > 5) this.handHistory.pop();
@@ -368,7 +369,7 @@ const tilesDisplay = this.currentHand.map(t => {
     this.leaderboard.sort((a, b) => b.score - a.score);
     this.leaderboard = this.leaderboard.slice(0, 10);
     
-    this.saveLeaderboardToFile();
+    // this.saveLeaderboardToFile();
     this.saveToLocalStorage();
     
     this.showSaveDialog = false;
@@ -376,33 +377,35 @@ const tilesDisplay = this.currentHand.map(t => {
     this.startNewGame();
   }
   
-  saveLeaderboardToFile() {
-    const data = JSON.stringify(this.leaderboard, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'leaderboard.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  // saveLeaderboardToFile() {
+  //   const data = JSON.stringify(this.leaderboard, null, 2);
+  //   const blob = new Blob([data], { type: 'application/json' });
+  //   const url = URL.createObjectURL(blob);
+  //   const a = document.createElement('a');
+  //   a.href = url;
+  //   a.download = 'leaderboard.json';
+  //   a.click();
+  //   URL.revokeObjectURL(url);
+  // }
   
   loadLeaderboard() {
     const saved = localStorage.getItem('mahjong_leaderboard');
+    
     if (saved) {
       this.leaderboard = JSON.parse(saved);
-    } else {
-      this.http.get<LeaderboardEntry[]>('/assets/leaderboard.json')
-        .subscribe({
-          next: (data) => {
-            this.leaderboard = data;
-            this.saveToLocalStorage();
-          },
-          error: () => {
-            this.leaderboard = [];
-          }
-        });
-    }
+    } 
+    // else {
+    //   this.http.get<LeaderboardEntry[]>('/assets/leaderboard.json')
+    //     .subscribe({
+    //       next: (data) => {
+    //         this.leaderboard = data;
+    //         this.saveToLocalStorage();
+    //       },
+    //       error: () => {
+    //         this.leaderboard = [];
+    //       }
+    //     });
+    // }
   }
   
   saveToLocalStorage() {
